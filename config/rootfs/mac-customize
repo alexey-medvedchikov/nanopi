@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -euo pipefail
+
+main() {
+	local interface=${1:?no interface specified}
+	local mac
+	mac=$(cat "/sys/class/net/$interface/address")
+
+	local last_octet
+	local hostname
+
+	case "$mac" in
+	# board1
+	ce:40:3e:92:a3:ca)
+		last_octet=101
+		hostname=node1
+		;;
+	# board2
+	3a:80:5b:d3:24:04)
+		last_octet=102
+		hostname=node2
+		;;
+	# board3
+	5e:cf:32:98:7b:7a)
+		last_octet=103
+		hostname=node3
+		;;
+	# board4
+	f6:38:e2:05:bc:ce)
+		last_octet=104
+		hostname=node4
+		;;
+	esac
+
+	sed -i "s/127.0.1.1 debian/127.0.1.1 $hostname/g" /etc/hosts
+	echo "$hostname" > /etc/hostname
+	hostname -F /etc/hostname
+	cat >"/etc/network/interfaces.d/$interface"<<EOF
+auto $interface
+iface $interface inet static
+	address 192.168.10.$last_octet
+	network 192.168.10.0
+	gateway 192.168.10.1
+	netmask 255.255.255.0
+EOF
+	ifup "$interface"
+}
+
+main "$@"
+

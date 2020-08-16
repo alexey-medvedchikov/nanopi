@@ -1,0 +1,10 @@
+[Unit]
+Description=Hostname and network setup based on MAC address
+Before=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/mac-customize eth0
+
+[Install]
+WantedBy=multi-user.target
