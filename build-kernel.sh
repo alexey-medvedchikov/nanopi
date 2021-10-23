@@ -13,24 +13,25 @@ KERNEL_COMPILER=aarch64-linux-gnu-
 KERNEL_URL=https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-$KERNEL_VERSION.tar.xz
 
 install_deps() {
-	apt-get update
-	apt-get install --yes --no-install-recommends \
-		bc \
-		bison \
-		build-essential \
-		ca-certificates \
-		ccache \
-		curl \
-		flex \
-		gcc-aarch64-linux-gnu \
-		kmod \
-		libssl-dev \
-		make \
-		xz-utils
+    apt-get update
+    apt-get install --yes --no-install-recommends \
+        bc \
+        bison \
+        build-essential \
+        ca-certificates \
+        ccache \
+        curl \
+        flex \
+        gcc-aarch64-linux-gnu \
+        kmod \
+        libssl-dev \
+        libncurses-dev \
+        make \
+        xz-utils
 }
 
 kernel_make() {
-	make -j "$MAKE_JOBS" ARCH=$KERNEL_ARCH CROSS_COMPILE="ccache $KERNEL_COMPILER" "$@"
+    make -j "$MAKE_JOBS" ARCH=$KERNEL_ARCH CROSS_COMPILE="ccache $KERNEL_COMPILER" "$@"
 }
 
 build_kernel() {
@@ -53,13 +54,13 @@ build_kernel() {
         kernel_make Image dtbs modules
         kernel_make Image.gz
         kernel_make INSTALL_DTBS_PATH=/tmp/boot/dtb INSTALL_PATH=/tmp/boot INSTALL_MOD_PATH=/tmp \
-        	zinstall dtbs_install modules_install
+            zinstall dtbs_install modules_install
         ln -s "vmlinuz-$KERNEL_VERSION" /tmp/boot/vmlinuz
     )
     (
-    	cd /tmp
-    	rm -rf "$OUTPUT_DIR/kernel-$KERNEL_VERSION.tar"
-    	tar -cf "$OUTPUT_DIR/kernel-$KERNEL_VERSION.tar" boot lib
+        cd /tmp
+        rm -rf "$OUTPUT_DIR/kernel-$KERNEL_VERSION.tar"
+        tar -cf "$OUTPUT_DIR/kernel-$KERNEL_VERSION.tar" boot lib
     )
 }
 

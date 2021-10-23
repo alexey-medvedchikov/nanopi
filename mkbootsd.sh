@@ -7,10 +7,10 @@ SCRIPT_DIR=$(realpath "$(dirname "$0")")
 main() {
     local device=${1:?device not specified}
 
-	if [[ ! -b "$device" ]]; then
-		echo "Device $device doesn't exist"
-		exit 1
-	fi
+    if [[ ! -b "$device" ]]; then
+        echo "Device $device doesn't exist"
+        exit 1
+    fi
     dd if=/dev/zero of="$device" oflag=direct bs=1M count=100
     bash "$SCRIPT_DIR/u-boot/platform_install.sh" "$SCRIPT_DIR/u-boot" "$device"
     parted "$device" mklabel msdos
